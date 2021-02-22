@@ -14,7 +14,6 @@ args = parser.parse_args()
 BOARD_SIZE = int(math.sqrt(args.nvalue + 1)) if args.nvalue else 3
 INPUT_FILE = args.file if args.file else 'input.txt'
 
-
 class Board:
     def __init__(self, grid, move_list):
         self.grid = grid
@@ -69,7 +68,7 @@ class Board:
             for column in range(BOARD_SIZE):
                 val = self.grid[row][column]
                 if val == value:
-                    return (row, column)
+                    return (row, column)       
 
 def is_board_solved(board):
     return board.f == board.g
@@ -90,7 +89,6 @@ def astar_solve(initial_grid):
         board = children_queue.get()[1]
     return board
 
-
 def count_inversions(grid):
     inversions = 0
     for row in range(BOARD_SIZE):
@@ -107,10 +105,6 @@ def count_inversions(grid):
                         if value > grid[row3][col3]:
                             inversions += 1
     return inversions
-
-
-def is_solveable(grid):
-    return count_inversions(grid) % 2 == 0
 
 def read_file(file_name):
     file = open(file_name, 'r')
@@ -136,18 +130,18 @@ def read_file(file_name):
         all_boards.append(board)
     return all_boards
 
-
 grids = read_file(INPUT_FILE)
 i = 1
 for grid in grids:
     print('Grid ' + str(i) + ':')
-    if is_solveable(grid):
+    inversion_count = count_inversions(grid)
+    if inversion_count % 2 == 0:
         board = astar_solve(grid)
-        print(board.move_list)
-        print('Solveable: ' + str(count_inversions(grid)) + ' inversions')
+        print('Solveable: ' +str(inversion_count) + ' inversions')
+        print('Moves: ' + str(board.move_list))
         print('Number of moves: ' + str(board.g))
     else:
-        print('Not solveable: ' + str(count_inversions(grid)) + ' inversions')
+        print('Not solveable: ' + str(inversion_count) + ' inversions')
     print()
     i += 1
 print('Total execution time: ' + str(time.perf_counter()) + 'sec')
