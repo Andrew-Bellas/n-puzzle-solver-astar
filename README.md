@@ -19,7 +19,7 @@ The first assignment in COMP-SCI 441 (Introduction to Artifical Intelligence) as
 The input file must be a `.txt` file in the following format:
 
 * First line: An integer representing the number of puzzles in the file
-* All remaining lines: space seperatd rows of values representing the rows of each board with an empty row seperating boards
+* All remaining lines: Rows containing space-seperated values with an empty row seperating boards
 
 An example input file can be found [here](https://github.com/Andrew-Bellas/n-puzzle-solver-astar/blob/main/input.txt)
 
