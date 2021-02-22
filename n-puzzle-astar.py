@@ -2,6 +2,7 @@ import argparse
 import math
 import copy
 from queue import PriorityQueue
+import time 
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -15,10 +16,10 @@ INPUT_FILE = args.file if args.file else 'input.txt'
 
 
 class Board:
-    def __init__(self, grid, g, prev_boards):
+    def __init__(self, grid, move_list):
         self.grid = grid
-        self.g = g
-        self.prev_boards = prev_boards
+        self.g = len(move_list)
+        self.move_list = move_list
         self.f = self.g + self.h()
 
     def __lt__(self, other):
@@ -58,10 +59,9 @@ class Board:
             temp_grid[empty_row][empty_column] = temp_grid[cordinate_pair[0]
                                                            ][cordinate_pair[1]]
             temp_grid[cordinate_pair[0]][cordinate_pair[1]] = BOARD_SIZE**2
-
-            child_prev_boards = copy.deepcopy(self.prev_boards)
-            child_prev_boards.append(self.grid)
-            children.append(Board(temp_grid, self.g + 1, child_prev_boards))
+            child_prev_moves = copy.deepcopy(self.move_list)
+            child_prev_moves.append(self.grid[cordinate_pair[0]][cordinate_pair[1]])
+            children.append(Board(temp_grid, child_prev_moves))
         return children
 
     def get_cordinates_for_value(self, value):
@@ -71,21 +71,17 @@ class Board:
                 if val == value:
                     return (row, column)
 
-    def print_grids(self):
-        grids = copy.deepcopy(self.prev_boards)
-        grids.append(self.grid)
-        for z in range(len(grids)):
-            for y in range(BOARD_SIZE):
-                value = grids[z][y]
-                print(['E' if x == BOARD_SIZE**2 else str(x) for x in value])
-            print()
+def is_board_solved(board):
+    return board.f == board.g
 
+def has_been_visited(grid, visited_grids):
+    return grid in visited_grids
 
 def astar_solve(initial_grid):
     visited_grids = []
     children_queue = PriorityQueue()
-    board = Board(initial_grid, 0, [])
-    while not is_grid_solved(board.grid):
+    board = Board(initial_grid, [])
+    while not is_board_solved(board):
         children = board.generate_children()
         for child in children:
             if not has_been_visited(child.grid, visited_grids):
@@ -115,20 +111,6 @@ def count_inversions(grid):
 
 def is_solveable(grid):
     return count_inversions(grid) % 2 == 0
-
-
-def is_grid_solved(grid):
-    for row in range(BOARD_SIZE):
-        for col in range(BOARD_SIZE):
-            value = grid[row][col]
-            if value != (row * BOARD_SIZE) + col + 1:
-                return False
-    return True
-
-
-def has_been_visited(grid, visited_grids):
-    return grid in visited_grids
-
 
 def read_file(file_name):
     file = open(file_name, 'r')
@@ -161,10 +143,11 @@ for grid in grids:
     print('Grid ' + str(i) + ':')
     if is_solveable(grid):
         board = astar_solve(grid)
-        board.print_grids()
+        print(board.move_list)
         print('Solveable: ' + str(count_inversions(grid)) + ' inversions')
         print('Number of moves: ' + str(board.g))
     else:
         print('Not solveable: ' + str(count_inversions(grid)) + ' inversions')
     print()
     i += 1
+print('Total execution time: ' + str(time.perf_counter()) + 'sec')
